@@ -2,6 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Unified 1-Page Master Console
+import { MasterSinglePage } from '../pages/MasterSinglePage';
+
 // Public & Layouts
 import { Home } from '../pages/Home';
 import { Login } from '../pages/auth/Login';
@@ -49,8 +52,13 @@ function ProtectedAdminRoute({ children }) {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
+      {/* 1-PAGE ALL-IN-ONE PRIMARY WORKSPACE */}
+      <Route path="/" element={<MasterSinglePage />} />
+      <Route path="/console" element={<MasterSinglePage />} />
+      <Route path="/all-in-one" element={<MasterSinglePage />} />
+
+      {/* Public Pages */}
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

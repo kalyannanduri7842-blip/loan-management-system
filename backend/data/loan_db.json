@@ -66,6 +66,82 @@
   ],
   "applications": [
     {
+      "id": "app-1788284145743",
+      "applicationNumber": "LN-10005",
+      "customerId": "usr-cust-1",
+      "customerName": "Rahul Kumar",
+      "customerEmail": "rahul@gmail.com",
+      "customerPhone": "+91 98765 11111",
+      "personalDetails": {
+        "fullName": "Rahul Kumar",
+        "dob": "1992-05-14",
+        "gender": "Male",
+        "mobile": "+91 98765 11111",
+        "email": "rahul@gmail.com",
+        "address": "Flat 302, Green Glen Heights, Bellandur, Bengaluru, Karnataka - 560103"
+      },
+      "employmentDetails": {
+        "employmentType": "Salaried",
+        "companyName": "TechCorp Global Solutions Pvt Ltd",
+        "monthlyIncome": 75000,
+        "workExperience": "6 Years",
+        "existingEmi": 5000
+      },
+      "loanDetails": {
+        "loanType": "Personal Loan",
+        "requestedAmount": 500000,
+        "tenureMonths": 36,
+        "loanPurpose": "Home renovation and interior woodwork"
+      },
+      "bankDetails": {
+        "bankName": "HDFC Bank",
+        "accountNumber": "50100234567890",
+        "ifscCode": "HDFC0001234"
+      },
+      "documents": {
+        "aadhaar": {
+          "name": "Aadhaar_Card_Front_Back.pdf",
+          "status": "PENDING",
+          "url": "/docs/aadhaar.pdf"
+        },
+        "pan": {
+          "name": "PAN_Card_Verified.pdf",
+          "status": "PENDING",
+          "url": "/docs/pan.pdf"
+        },
+        "salarySlip": {
+          "name": "Salary_Slip_Last_3Months.pdf",
+          "status": "PENDING",
+          "url": "/docs/salary.pdf"
+        },
+        "bankStatement": {
+          "name": "Bank_Statement_6Months.pdf",
+          "status": "PENDING",
+          "url": "/docs/statement.pdf"
+        },
+        "addressProof": {
+          "name": "Electricity_Bill_Latest.pdf",
+          "status": "PENDING",
+          "url": "/docs/address.pdf"
+        }
+      },
+      "creditAssessment": {
+        "creditScore": 760,
+        "monthlyIncome": 75000,
+        "existingEmi": 5000,
+        "estimatedNewEmi": 16607,
+        "totalMonthlyDebt": 21607,
+        "dtiRatio": 29,
+        "eligibilityStatus": "ELIGIBLE",
+        "assessmentNotes": "Strong financial profile and healthy credit score."
+      },
+      "status": "PENDING_REVIEW",
+      "adminRemarks": "",
+      "rejectionReason": "",
+      "createdAt": "2026-09-01T17:35:45.743Z",
+      "updatedAt": "2026-09-01T17:35:45.743Z"
+    },
+    {
       "id": "app-1788284060346",
       "applicationNumber": "LN-10004",
       "customerId": "usr-cust-1788284060332",
@@ -1800,6 +1876,26 @@
   ],
   "notifications": [
     {
+      "id": "notif-1788284145744-71",
+      "userId": "usr-admin-1",
+      "title": "New Loan Application Received",
+      "message": "New application LN-10005 received from Rahul Kumar for ₹5,00,000 (Personal Loan).",
+      "type": "NEW_APPLICATION",
+      "link": "/admin/applications/app-1788284145743",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:35:45.745Z"
+    },
+    {
+      "id": "notif-1788284145743-252",
+      "userId": "usr-cust-1",
+      "title": "Loan Application Submitted Successfully",
+      "message": "Your application LN-10005 for Personal Loan (₹5,00,000) is now under review.",
+      "type": "APPLICATION_SUBMITTED",
+      "link": "/my-applications",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:35:45.743Z"
+    },
+    {
       "id": "notif-1788284060479-459",
       "userId": "usr-cust-1788284060332",
       "title": "EMI #1 Payment Successful",
@@ -1914,6 +2010,27 @@
     "supportPhone": "1800-456-7890"
   },
   "auditLogs": [
+    {
+      "id": "log-1788284156304-433",
+      "actor": "Prakash Joshi (Chief Credit Officer)",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as ADMIN",
+      "timestamp": "2026-09-01T17:35:56.304Z"
+    },
+    {
+      "id": "log-1788284145746-605",
+      "actor": "Rahul Kumar",
+      "action": "APPLICATION_CREATED",
+      "details": "Created loan application LN-10005 for ₹500000 (Personal Loan)",
+      "timestamp": "2026-09-01T17:35:45.746Z"
+    },
+    {
+      "id": "log-1788284133681-982",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:35:33.681Z"
+    },
     {
       "id": "log-1788284060480-339",
       "actor": "Kalyan Nanduri",
