@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-// Unified 1-Page Master Console (Merged All Domains & Two-Way Notifications)
+// Unified 1-Page Master Console
 import { MasterSinglePage } from '../pages/MasterSinglePage';
 
 // Public & Layouts
@@ -52,18 +52,20 @@ function ProtectedAdminRoute({ children }) {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* 1. PRIMARY ALL-IN-ONE SINGLE PAGE CONSOLE (MERGED WORKSPACE) */}
-      <Route path="/" element={<MasterSinglePage />} />
-      <Route path="/all-in-one" element={<MasterSinglePage />} />
-      <Route path="/console" element={<MasterSinglePage />} />
-
-      {/* 2. PUBLIC & INDEPENDENT SCREENS */}
+      {/* 1. OFFICIAL HOME PAGE */}
+      <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
+
+      {/* 2. AUTHENTICATION (CUSTOMER & ADMIN LOGIN & REGISTRATION) */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* 3. CUSTOMER PORTAL */}
+      {/* 3. UNIFIED 1-PAGE CONSOLE */}
+      <Route path="/all-in-one" element={<MasterSinglePage />} />
+      <Route path="/console" element={<MasterSinglePage />} />
+
+      {/* 4. CUSTOMER WORKSPACE PORTAL */}
       <Route
         element={
           <ProtectedCustomerRoute>
@@ -82,7 +84,7 @@ export function AppRoutes() {
         <Route path="/profile" element={<CustomerProfile />} />
       </Route>
 
-      {/* 4. ADMIN PORTAL */}
+      {/* 5. ADMIN OPERATIONS CONSOLE */}
       <Route
         path="/admin"
         element={

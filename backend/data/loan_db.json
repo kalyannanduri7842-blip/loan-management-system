@@ -36,6 +36,158 @@
   ],
   "applications": [
     {
+      "id": "app-1788285585812",
+      "applicationNumber": "LN-10004",
+      "customerId": "usr-cust-1",
+      "customerName": "Rahul Kumar",
+      "customerEmail": "customer@loan.com",
+      "customerPhone": "+91 98765 11111",
+      "personalDetails": {
+        "fullName": "Rahul Kumar",
+        "dob": "1992-05-14",
+        "gender": "Male",
+        "mobile": "+91 98765 11111",
+        "email": "customer@loan.com",
+        "address": "Bengaluru, Karnataka"
+      },
+      "employmentDetails": {
+        "employmentType": "Salaried",
+        "companyName": "TechCorp Global Solutions",
+        "monthlyIncome": 75000,
+        "workExperience": "5 Years",
+        "existingEmi": 5000
+      },
+      "loanDetails": {
+        "loanType": "Personal Loan",
+        "requestedAmount": 500000,
+        "tenureMonths": 36,
+        "loanPurpose": "Home interior renovation and appliances purchase"
+      },
+      "bankDetails": {
+        "bankName": "HDFC Bank",
+        "accountNumber": "50100234567890",
+        "ifscCode": "HDFC0001234"
+      },
+      "documents": {
+        "aadhaar": {
+          "name": "Aadhaar_Card.pdf",
+          "status": "PENDING",
+          "url": "/docs/aadhaar.pdf"
+        },
+        "pan": {
+          "name": "PAN_Card.pdf",
+          "status": "PENDING",
+          "url": "/docs/pan.pdf"
+        },
+        "salarySlip": {
+          "name": "Salary_Slip_3M.pdf",
+          "status": "PENDING",
+          "url": "/docs/salary.pdf"
+        },
+        "bankStatement": {
+          "name": "Bank_Statement_6M.pdf",
+          "status": "PENDING",
+          "url": "/docs/statement.pdf"
+        },
+        "addressProof": {
+          "name": "Electricity_Bill.pdf",
+          "status": "PENDING",
+          "url": "/docs/address.pdf"
+        }
+      },
+      "creditAssessment": {
+        "creditScore": 760,
+        "monthlyIncome": 75000,
+        "existingEmi": 5000,
+        "estimatedNewEmi": 16607,
+        "totalMonthlyDebt": 21607,
+        "dtiRatio": 29,
+        "eligibilityStatus": "ELIGIBLE",
+        "assessmentNotes": "Strong financial profile and healthy credit score."
+      },
+      "status": "PENDING_REVIEW",
+      "adminRemarks": "",
+      "rejectionReason": "",
+      "createdAt": "2026-09-01T17:59:45.812Z",
+      "updatedAt": "2026-09-01T17:59:45.812Z"
+    },
+    {
+      "id": "app-1788285579755",
+      "applicationNumber": "LN-10003",
+      "customerId": "usr-cust-1",
+      "customerName": "Rahul Kumar",
+      "customerEmail": "customer@loan.com",
+      "customerPhone": "+91 98765 11111",
+      "personalDetails": {
+        "fullName": "Rahul Kumar",
+        "dob": "1992-05-14",
+        "gender": "Male",
+        "mobile": "+91 98765 11111",
+        "email": "customer@loan.com",
+        "address": "Bengaluru, Karnataka"
+      },
+      "employmentDetails": {
+        "employmentType": "Salaried",
+        "companyName": "TechCorp Global Solutions",
+        "monthlyIncome": 75000,
+        "workExperience": "5 Years",
+        "existingEmi": 5000
+      },
+      "loanDetails": {
+        "loanType": "Personal Loan",
+        "requestedAmount": 500000,
+        "tenureMonths": 36,
+        "loanPurpose": "Home interior renovation and appliances purchase"
+      },
+      "bankDetails": {
+        "bankName": "HDFC Bank",
+        "accountNumber": "50100234567890",
+        "ifscCode": "HDFC0001234"
+      },
+      "documents": {
+        "aadhaar": {
+          "name": "Aadhaar_Card.pdf",
+          "status": "PENDING",
+          "url": "/docs/aadhaar.pdf"
+        },
+        "pan": {
+          "name": "PAN_Card.pdf",
+          "status": "PENDING",
+          "url": "/docs/pan.pdf"
+        },
+        "salarySlip": {
+          "name": "Salary_Slip_3M.pdf",
+          "status": "PENDING",
+          "url": "/docs/salary.pdf"
+        },
+        "bankStatement": {
+          "name": "Bank_Statement_6M.pdf",
+          "status": "PENDING",
+          "url": "/docs/statement.pdf"
+        },
+        "addressProof": {
+          "name": "Electricity_Bill.pdf",
+          "status": "PENDING",
+          "url": "/docs/address.pdf"
+        }
+      },
+      "creditAssessment": {
+        "creditScore": 760,
+        "monthlyIncome": 75000,
+        "existingEmi": 5000,
+        "estimatedNewEmi": 16607,
+        "totalMonthlyDebt": 21607,
+        "dtiRatio": 29,
+        "eligibilityStatus": "ELIGIBLE",
+        "assessmentNotes": "Strong financial profile and healthy credit score."
+      },
+      "status": "PENDING_REVIEW",
+      "adminRemarks": "",
+      "rejectionReason": "",
+      "createdAt": "2026-09-01T17:59:39.755Z",
+      "updatedAt": "2026-09-01T17:59:39.755Z"
+    },
+    {
       "id": "app-1788285334418",
       "applicationNumber": "LN-10002",
       "customerId": "usr-cust-1",
@@ -798,6 +950,46 @@
   ],
   "notifications": [
     {
+      "id": "notif-1788285585814-925",
+      "userId": "usr-admin-1",
+      "title": "New Loan Application Received",
+      "message": "New application LN-10004 received from Rahul Kumar for ₹5,00,000 (Personal Loan).",
+      "type": "NEW_APPLICATION",
+      "link": "/admin/applications/app-1788285585812",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:59:45.814Z"
+    },
+    {
+      "id": "notif-1788285585813-103",
+      "userId": "usr-cust-1",
+      "title": "Loan Application Submitted Successfully",
+      "message": "Your application LN-10004 for Personal Loan (₹5,00,000) is now under review.",
+      "type": "APPLICATION_SUBMITTED",
+      "link": "/my-applications",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:59:45.813Z"
+    },
+    {
+      "id": "notif-1788285579756-505",
+      "userId": "usr-admin-1",
+      "title": "New Loan Application Received",
+      "message": "New application LN-10003 received from Rahul Kumar for ₹5,00,000 (Personal Loan).",
+      "type": "NEW_APPLICATION",
+      "link": "/admin/applications/app-1788285579755",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:59:39.756Z"
+    },
+    {
+      "id": "notif-1788285579755-845",
+      "userId": "usr-cust-1",
+      "title": "Loan Application Submitted Successfully",
+      "message": "Your application LN-10003 for Personal Loan (₹5,00,000) is now under review.",
+      "type": "APPLICATION_SUBMITTED",
+      "link": "/my-applications",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:59:39.755Z"
+    },
+    {
       "id": "notif-1788285528665-530",
       "userId": "usr-cust-1788285286732",
       "title": "Offline EMI Payment Recorded (EMI #29)",
@@ -912,6 +1104,55 @@
     "supportPhone": "1800-456-7890"
   },
   "auditLogs": [
+    {
+      "id": "log-1788285612745-616",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T18:00:12.745Z"
+    },
+    {
+      "id": "log-1788285585814-417",
+      "actor": "Rahul Kumar",
+      "action": "APPLICATION_CREATED",
+      "details": "Created loan application LN-10004 for ₹500000 (Personal Loan)",
+      "timestamp": "2026-09-01T17:59:45.814Z"
+    },
+    {
+      "id": "log-1788285579757-306",
+      "actor": "Rahul Kumar",
+      "action": "APPLICATION_CREATED",
+      "details": "Created loan application LN-10003 for ₹500000 (Personal Loan)",
+      "timestamp": "2026-09-01T17:59:39.757Z"
+    },
+    {
+      "id": "log-1788285574016-642",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:59:34.016Z"
+    },
+    {
+      "id": "log-1788285573777-844",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:59:33.777Z"
+    },
+    {
+      "id": "log-1788285570910-364",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:59:30.910Z"
+    },
+    {
+      "id": "log-1788285566051-720",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:59:26.051Z"
+    },
     {
       "id": "log-1788285344388-698",
       "actor": "Administrator (Chief Underwriting Officer)",
