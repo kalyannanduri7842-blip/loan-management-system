@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-slate-900 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Simple, human-crafted scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+@layer components {
+  /* Simple, high-contrast, clean UI buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center font-semibold text-xs uppercase tracking-wider bg-slate-900 text-white px-4 py-2 hover:bg-slate-800 active:bg-black transition-colors rounded-none border border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-1;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center font-semibold text-xs uppercase tracking-wider bg-white text-slate-900 px-4 py-2 hover:bg-slate-50 active:bg-slate-100 transition-colors rounded-none border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400;
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center font-semibold text-xs uppercase tracking-wider bg-emerald-700 text-white px-4 py-2 hover:bg-emerald-800 transition-colors rounded-none border border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center font-semibold text-xs uppercase tracking-wider bg-rose-700 text-white px-4 py-2 hover:bg-rose-800 transition-colors rounded-none border border-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-600;
+  }
+
+  /* Form input controls */
+  .input-field {
+    @apply w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-none text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors;
+  }
+
+  /* Tables */
+  .table-header {
+    @apply px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border-b border-slate-200;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-xs text-slate-700 border-b border-slate-100;
+  }
+
+  /* Minimalist financial metric cards */
+  .metric-card {
+    @apply bg-white border border-slate-200 p-5 space-y-1.5 transition-shadow hover:border-slate-300;
+  }
+}
