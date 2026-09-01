@@ -17,7 +17,9 @@ import {
   Building2,
   Car,
   GraduationCap,
-  Briefcase
+  Briefcase,
+  User,
+  Shield
 } from 'lucide-react';
 
 export function Home() {
@@ -108,28 +110,29 @@ export function Home() {
               </p>
             </div>
 
-            {/* 3 Call-To-Action Buttons */}
+            {/* Separate Call-To-Action Buttons for Customer and Admin */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
-                to="/login?role=customer"
+                to="/customer-login"
                 className="btn-primary py-2.5 px-6 text-xs uppercase tracking-wider font-bold bg-emerald-500 text-slate-950 border-emerald-500 hover:bg-emerald-400 flex items-center gap-1.5"
               >
-                <span>Apply for Loan</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5" />
+                <span>Customer Login</span>
               </Link>
 
               <Link
-                to="/login?role=customer"
+                to="/customer-register"
                 className="btn-primary py-2.5 px-6 text-xs uppercase tracking-wider font-bold bg-white text-slate-900 border-white hover:bg-slate-100"
               >
-                👤 Customer Login
+                Register as Customer
               </Link>
 
               <Link
-                to="/login?role=admin"
-                className="btn-secondary py-2.5 px-6 text-xs uppercase tracking-wider font-bold text-slate-200 border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white"
+                to="/admin-login"
+                className="btn-secondary py-2.5 px-6 text-xs uppercase tracking-wider font-bold text-slate-200 border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white flex items-center gap-1.5"
               >
-                🛡️ Admin Login
+                <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Admin Login</span>
               </Link>
             </div>
 
@@ -200,7 +203,7 @@ export function Home() {
                   </div>
 
                   <Link
-                    to="/login?role=customer"
+                    to="/customer-login"
                     className="btn-secondary w-full py-1.5 text-xs flex items-center justify-center gap-1 mt-2"
                   >
                     <span>Apply for {prod.title}</span>
@@ -303,7 +306,7 @@ export function Home() {
               </div>
 
               <Link
-                to="/login?role=customer"
+                to="/customer-login"
                 className="btn-primary w-full py-2.5 text-xs uppercase tracking-wider font-bold bg-emerald-500 text-slate-950 border-emerald-500 hover:bg-emerald-400 flex items-center justify-center gap-1.5 mt-4"
               >
                 <span>Proceed to Apply →</span>

@@ -7,7 +7,8 @@ import { MasterSinglePage } from '../pages/MasterSinglePage';
 
 // Public & Layouts
 import { Home } from '../pages/Home';
-import { Login } from '../pages/auth/Login';
+import { CustomerLogin } from '../pages/auth/CustomerLogin';
+import { AdminLogin } from '../pages/auth/AdminLogin';
 import { Register } from '../pages/auth/Register';
 import { ForgotPassword } from '../pages/auth/ForgotPassword';
 import { CustomerLayout } from '../components/layout/CustomerLayout';
@@ -37,14 +38,14 @@ import { AdminSettings } from '../pages/admin/AdminSettings';
 
 function ProtectedCustomerRoute({ children }) {
   const { user, isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login?role=customer" replace />;
+  if (!isAuthenticated) return <Navigate to="/customer-login" replace />;
   if (user?.role === 'ADMIN') return <Navigate to="/admin/dashboard" replace />;
   return children;
 }
 
 function ProtectedAdminRoute({ children }) {
   const { user, isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login?role=admin" replace />;
+  if (!isAuthenticated) return <Navigate to="/admin-login" replace />;
   if (user?.role !== 'ADMIN') return <Navigate to="/dashboard" replace />;
   return children;
 }
@@ -52,16 +53,22 @@ function ProtectedAdminRoute({ children }) {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* 1. OFFICIAL HOME PAGE */}
+      {/* 1. PRIMARY HOME PAGE */}
       <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
 
-      {/* 2. AUTHENTICATION (CUSTOMER & ADMIN LOGIN & REGISTRATION) */}
-      <Route path="/login" element={<Login />} />
+      {/* 2. DEDICATED SEPARATE LOGIN & REGISTER PAGES */}
+      <Route path="/customer-login" element={<CustomerLogin />} />
+      <Route path="/login" element={<CustomerLogin />} />
+      <Route path="/customer-register" element={<Register />} />
       <Route path="/register" element={<Register />} />
+
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* 3. UNIFIED 1-PAGE CONSOLE */}
+      {/* 3. UNIFIED ALL-IN-ONE CONSOLE */}
       <Route path="/all-in-one" element={<MasterSinglePage />} />
       <Route path="/console" element={<MasterSinglePage />} />
 
