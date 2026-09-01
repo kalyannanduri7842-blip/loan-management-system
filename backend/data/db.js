@@ -8,7 +8,6 @@ import {
   SEED_NOTIFICATIONS,
   SEED_SETTINGS
 } from './seedData.js';
-import { generateEmiSchedule } from '../utils/loanCalculator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,66 +29,27 @@ class LoanDatabase {
   }
 
   init() {
-    if (fs.existsSync(DB_FILE)) {
-      try {
-        const raw = fs.readFileSync(DB_FILE, 'utf-8');
-        this.data = JSON.parse(raw);
-        console.log(`📦 Loaded existing Loan database from ${DB_FILE}`);
-        return;
-      } catch (err) {
-        console.warn('⚠️ Could not parse existing DB, re-seeding...', err);
-      }
-    }
-
-    // Generate initial EMI schedule for loan-10001
-    const schedule1 = generateEmiSchedule('loan-10001', 800000, 9.5, 48, '2026-05-15T16:00:00Z');
-    // Mark first 4 EMIs as paid
-    const initialPayments = [];
-    for (let i = 0; i < 4; i++) {
-      schedule1[i].status = 'PAID';
-      schedule1[i].paidAmount = schedule1[i].emiAmount;
-      schedule1[i].paidDate = schedule1[i].dueDate;
-      schedule1[i].paymentMethod = 'UPI';
-      schedule1[i].transactionRef = `TXN-2026-0${i + 6}-9942`;
-
-      initialPayments.push({
-        id: `pay-1000${i + 1}`,
-        loanId: 'loan-10001',
-        loanNumber: 'LOAN-10001',
-        customerId: 'usr-cust-3',
-        customerName: 'Arun Verma',
-        emiScheduleId: schedule1[i].id,
-        emiNumber: i + 1,
-        amountPaid: schedule1[i].emiAmount,
-        paymentMethod: 'UPI',
-        transactionRef: `TXN-2026-0${i + 6}-9942`,
-        paymentDate: schedule1[i].dueDate,
-        status: 'SUCCESS',
-        createdAt: schedule1[i].dueDate
-      });
-    }
-
     this.data = {
       users: SEED_USERS,
       applications: SEED_APPLICATIONS,
       loans: SEED_LOANS,
-      emiSchedules: schedule1,
-      payments: initialPayments,
+      emiSchedules: [],
+      payments: [],
       notifications: SEED_NOTIFICATIONS,
       settings: SEED_SETTINGS,
       auditLogs: [
         {
           id: 'log-1',
-          actor: 'System Initialization',
+          actor: 'System',
           action: 'SYSTEM_BOOT',
-          details: 'Initialized Loan Management System database.',
+          details: 'Initialized clean Loan Management System database ready for live user input.',
           timestamp: new Date().toISOString()
         }
       ]
     };
 
     this.save();
-    console.log(`🌱 Seeded Loan database with ${this.data.applications.length} applications and ${this.data.users.length} users to ${DB_FILE}`);
+    console.log(`🌱 Initialized clean Loan database at ${DB_FILE}`);
   }
 
   save() {
