@@ -36,6 +36,82 @@
   ],
   "applications": [
     {
+      "id": "app-1788285334418",
+      "applicationNumber": "LN-10002",
+      "customerId": "usr-cust-1",
+      "customerName": "Rahul Kumar",
+      "customerEmail": "customer@loan.com",
+      "customerPhone": "+91 98765 11111",
+      "personalDetails": {
+        "fullName": "Rahul Kumar",
+        "dob": "1992-05-14",
+        "gender": "Male",
+        "mobile": "+91 98765 11111",
+        "email": "customer@loan.com",
+        "address": "Bengaluru, Karnataka"
+      },
+      "employmentDetails": {
+        "employmentType": "Salaried",
+        "companyName": "TechCorp Global Solutions Pvt Ltd",
+        "monthlyIncome": 75000,
+        "workExperience": "6 Years",
+        "existingEmi": 5000
+      },
+      "loanDetails": {
+        "loanType": "Personal Loan",
+        "requestedAmount": 500000,
+        "tenureMonths": 36,
+        "loanPurpose": "Home renovation and interior woodwork"
+      },
+      "bankDetails": {
+        "bankName": "HDFC Bank",
+        "accountNumber": "50100234567890",
+        "ifscCode": "HDFC0001234"
+      },
+      "documents": {
+        "aadhaar": {
+          "name": "Aadhaar_Card_Front_Back.pdf",
+          "status": "PENDING",
+          "url": "/docs/aadhaar.pdf"
+        },
+        "pan": {
+          "name": "PAN_Card_Verified.pdf",
+          "status": "PENDING",
+          "url": "/docs/pan.pdf"
+        },
+        "salarySlip": {
+          "name": "Salary_Slip_Last_3Months.pdf",
+          "status": "PENDING",
+          "url": "/docs/salary.pdf"
+        },
+        "bankStatement": {
+          "name": "Bank_Statement_6Months.pdf",
+          "status": "PENDING",
+          "url": "/docs/statement.pdf"
+        },
+        "addressProof": {
+          "name": "Electricity_Bill_Latest.pdf",
+          "status": "PENDING",
+          "url": "/docs/address.pdf"
+        }
+      },
+      "creditAssessment": {
+        "creditScore": 760,
+        "monthlyIncome": 75000,
+        "existingEmi": 5000,
+        "estimatedNewEmi": 16607,
+        "totalMonthlyDebt": 21607,
+        "dtiRatio": 29,
+        "eligibilityStatus": "ELIGIBLE",
+        "assessmentNotes": "Strong financial profile and healthy credit score."
+      },
+      "status": "PENDING_REVIEW",
+      "adminRemarks": "",
+      "rejectionReason": "",
+      "createdAt": "2026-09-01T17:55:34.418Z",
+      "updatedAt": "2026-09-01T17:55:34.418Z"
+    },
+    {
       "id": "app-1788285286743",
       "applicationNumber": "LN-10001",
       "customerId": "usr-cust-1788285286732",
@@ -128,8 +204,8 @@
       "tenureMonths": 36,
       "emiAmount": 19786,
       "totalPayableAmount": 712296,
-      "totalPaidAmount": 19786,
-      "remainingPrincipal": 585964,
+      "totalPaidAmount": 39572,
+      "remainingPrincipal": 567631,
       "disbursedDate": "2026-09-01T17:54:46.810Z",
       "firstEmiDate": "2026-10-01",
       "bankDetails": {
@@ -138,7 +214,7 @@
         "ifscCode": "UTIB0000123"
       },
       "status": "ACTIVE",
-      "paidEmisCount": 1,
+      "paidEmisCount": 2,
       "totalEmisCount": 36,
       "createdAt": "2026-09-01T17:54:46.804Z"
     }
@@ -573,11 +649,11 @@
       "principalComponent": 18333,
       "interestComponent": 1453,
       "remainingBalance": 133322,
-      "paidAmount": 0,
-      "paidDate": null,
-      "paymentMethod": null,
-      "transactionRef": null,
-      "status": "UPCOMING"
+      "paidAmount": 19786,
+      "paidDate": "2026-09-01",
+      "paymentMethod": "CASH",
+      "transactionRef": "BRANCH-REC-27333",
+      "status": "PAID"
     },
     {
       "id": "emi-loan-10001-30",
@@ -687,6 +763,22 @@
   ],
   "payments": [
     {
+      "id": "pay-1788285528664",
+      "loanId": "loan-10001",
+      "loanNumber": "LOAN-10001",
+      "customerId": "usr-cust-1788285286732",
+      "customerName": "Kalyan Nanduri",
+      "emiScheduleId": "emi-loan-10001-29",
+      "emiNumber": 29,
+      "amountPaid": 19786,
+      "paymentMethod": "CASH",
+      "transactionRef": "BRANCH-REC-27333",
+      "paymentDate": "2026-09-01T17:58:48.664Z",
+      "status": "SUCCESS",
+      "collectedBy": "Administrator (Chief Underwriting Officer)",
+      "createdAt": "2026-09-01T17:58:48.664Z"
+    },
+    {
       "id": "pay-1788285286834",
       "loanId": "loan-10001",
       "loanNumber": "LOAN-10001",
@@ -705,6 +797,36 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif-1788285528665-530",
+      "userId": "usr-cust-1788285286732",
+      "title": "Offline EMI Payment Recorded (EMI #29)",
+      "message": "Cash/Bank collection of ₹19,786 for LOAN-10001 recorded by Administrator (Chief Underwriting Officer).",
+      "type": "PAYMENT_SUCCESS",
+      "link": "/my-loans",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:58:48.665Z"
+    },
+    {
+      "id": "notif-1788285334420-750",
+      "userId": "usr-admin-1",
+      "title": "New Loan Application Received",
+      "message": "New application LN-10002 received from Rahul Kumar for ₹5,00,000 (Personal Loan).",
+      "type": "NEW_APPLICATION",
+      "link": "/admin/applications/app-1788285334418",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:55:34.420Z"
+    },
+    {
+      "id": "notif-1788285334419-527",
+      "userId": "usr-cust-1",
+      "title": "Loan Application Submitted Successfully",
+      "message": "Your application LN-10002 for Personal Loan (₹5,00,000) is now under review.",
+      "type": "APPLICATION_SUBMITTED",
+      "link": "/my-applications",
+      "isRead": false,
+      "createdAt": "2026-09-01T17:55:34.419Z"
+    },
     {
       "id": "notif-1788285286835-119",
       "userId": "usr-cust-1788285286732",
@@ -790,6 +912,27 @@
     "supportPhone": "1800-456-7890"
   },
   "auditLogs": [
+    {
+      "id": "log-1788285344388-698",
+      "actor": "Administrator (Chief Underwriting Officer)",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as ADMIN",
+      "timestamp": "2026-09-01T17:55:44.388Z"
+    },
+    {
+      "id": "log-1788285334421-20",
+      "actor": "Rahul Kumar",
+      "action": "APPLICATION_CREATED",
+      "details": "Created loan application LN-10002 for ₹500000 (Personal Loan)",
+      "timestamp": "2026-09-01T17:55:34.421Z"
+    },
+    {
+      "id": "log-1788285321995-301",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T17:55:21.995Z"
+    },
     {
       "id": "log-1788285286836-421",
       "actor": "Kalyan Nanduri",

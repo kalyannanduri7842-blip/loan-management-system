@@ -3,7 +3,6 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { DocumentViewerModal } from '../components/ui/DocumentViewerModal';
 import {
   Landmark,
   Shield,
@@ -27,80 +26,79 @@ import {
   Receipt,
   Users,
   Briefcase,
-  ChevronDown,
   Upload,
   Lock,
   Mail,
   Phone,
-  LogOut,
   Send,
-  Home as HomeIcon,
-  Car,
-  GraduationCap
+  Sparkles,
+  ChevronRight,
+  CheckCheck
 } from 'lucide-react';
 
 export function MasterSinglePage() {
-  const { user, login, register, logout, isAdmin, isCustomer, isAuthenticated } = useAuth();
+  const { user, login, register, logout, isAuthenticated } = useAuth();
   const { addToast } = useToast();
 
-  // Authentication Box State
-  const [authMode, setAuthMode] = useState('LOGIN'); // 'LOGIN' | 'REGISTER'
-  const [authRole, setAuthRole] = useState('CUSTOMER'); // 'CUSTOMER' | 'ADMIN'
-  const [authEmail, setAuthEmail] = useState('customer@loan.com');
-  const [authPassword, setAuthPassword] = useState('customer123');
-  const [authName, setAuthName] = useState('');
-  const [authPhone, setAuthPhone] = useState('');
-  const [authIncome, setAuthIncome] = useState(75000);
-  const [authLoading, setAuthLoading] = useState(false);
+  // Active Role Focus for Quick Action & Perspective
+  const [activePerspective, setActivePerspective] = useState('ALL'); // 'ALL' | 'CUSTOMER' | 'ADMIN'
 
-  // Live Collections
+  // Live Database Collections
   const [adminStats, setAdminStats] = useState(null);
   const [applications, setApplications] = useState([]);
   const [loans, setLoans] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [selectedLoanId, setSelectedLoanId] = useState('');
-  const [notifications, setNotifications] = useState([]);
+  const [adminNotifications, setAdminNotifications] = useState([]);
+  const [customerNotifications, setCustomerNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Modals & Action States
   const [selectedApp, setSelectedApp] = useState(null);
-  const [selectedDocType, setSelectedDocType] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showDisburseModal, setShowDisburseModal] = useState(null);
   const [payingEmi, setPayingEmi] = useState(null);
 
-  // Action Forms
-  const [approveForm, setApproveForm] = useState({ approvedAmount: 500000, annualRate: 12.0, tenureMonths: 36, adminRemarks: 'Income & KYC verified. Sanctioned by Credit Committee.' });
-  const [rejectForm, setRejectForm] = useState({ rejectionReason: 'Debt-to-Income Exceeded', adminRemarks: 'Monthly debt obligations exceed policy underwriting limits.' });
+  // Forms
+  const [approveForm, setApproveForm] = useState({
+    approvedAmount: 500000,
+    annualRate: 12.0,
+    tenureMonths: 36,
+    adminRemarks: 'Income, KYC documents, and CIBIL score verified. Loan sanctioned.'
+  });
+  const [rejectForm, setRejectForm] = useState({
+    rejectionReason: 'Debt-to-Income Exceeded',
+    adminRemarks: 'Monthly debt obligations exceed underwriting risk policy limits.'
+  });
   const [disburseRef, setDisburseRef] = useState('NEFT-AXIS-992100');
   const [paymentMethod, setPaymentMethod] = useState('UPI');
 
-  // Customer Application Form (Starts Clean for User Input)
+  // Customer Application Form
   const [applyForm, setApplyForm] = useState({
-    fullName: '',
-    dob: '',
+    fullName: 'Rahul Kumar',
+    dob: '1992-05-14',
     gender: 'Male',
-    mobile: '',
-    email: '',
-    address: '',
+    mobile: '+91 98765 11111',
+    email: 'customer@loan.com',
+    address: 'Flat 302, Green Glen Heights, Bengaluru, Karnataka',
     employmentType: 'Salaried',
-    companyName: '',
+    companyName: 'TechCorp Global Solutions',
     monthlyIncome: 75000,
-    existingEmi: 0,
+    existingEmi: 5000,
     loanType: 'Personal Loan',
     requestedAmount: 500000,
     tenureMonths: 36,
-    loanPurpose: '',
-    bankName: '',
-    accountNumber: '',
-    ifscCode: '',
+    loanPurpose: 'Home interior renovation and appliances purchase',
+    bankName: 'HDFC Bank',
+    accountNumber: '50100234567890',
+    ifscCode: 'HDFC0001234',
     documents: {
       aadhaar: 'Aadhaar_Card.pdf',
       pan: 'PAN_Card.pdf',
-      salarySlip: 'Salary_Slip.pdf',
+      salarySlip: 'Salary_Slip_3M.pdf',
       bankStatement: 'Bank_Statement_6M.pdf',
-      addressProof: 'Address_Proof.pdf'
+      addressProof: 'Electricity_Bill.pdf'
     }
   });
 
@@ -110,16 +108,16 @@ export function MasterSinglePage() {
   const [calcRate, setCalcRate] = useState(12.0);
   const [calcEmi, setCalcEmi] = useState(16607);
 
-  // Sync user details to applyForm when user logs in
+  // Sync user details when logged in
   useEffect(() => {
-    if (user) {
+    if (user && user.role === 'CUSTOMER') {
       setApplyForm(prev => ({
         ...prev,
-        fullName: user.fullName || '',
-        email: user.email || '',
-        mobile: user.phone || '',
-        address: user.address || '',
-        monthlyIncome: user.monthlyIncome || 75000
+        fullName: user.fullName || prev.fullName,
+        email: user.email || prev.email,
+        mobile: user.phone || prev.mobile,
+        address: user.address || prev.address,
+        monthlyIncome: user.monthlyIncome || prev.monthlyIncome
       }));
     }
   }, [user]);
@@ -128,12 +126,15 @@ export function MasterSinglePage() {
   const refreshAllData = async () => {
     setLoading(true);
     try {
+      // 1. Dashboard stats
       const dash = await api.admin.getDashboard().catch(() => null);
       if (dash) setAdminStats(dash);
 
+      // 2. All Applications
       const appsRes = await api.admin.getApplications({ limit: 100 }).catch(() => null);
       if (appsRes?.applications) setApplications(appsRes.applications);
 
+      // 3. All Loans
       const loansRes = await api.admin.getLoans({ limit: 100 }).catch(() => null);
       if (loansRes?.loans) {
         setLoans(loansRes.loans);
@@ -150,8 +151,13 @@ export function MasterSinglePage() {
         setSchedule([]);
       }
 
+      // 4. Dual Notifications (Admin & Customer)
       const notifsRes = await api.notifications.getMy().catch(() => null);
-      if (notifsRes?.notifications) setNotifications(notifsRes.notifications);
+      if (notifsRes?.notifications) {
+        const list = notifsRes.notifications;
+        setAdminNotifications(list.filter(n => n.type === 'NEW_APPLICATION' || n.type === 'ADMIN_ALERT' || !n.userId || n.userId === 'usr-admin-1'));
+        setCustomerNotifications(list.filter(n => n.type === 'LOAN_APPROVED' || n.type === 'LOAN_REJECTED' || n.type === 'LOAN_DISBURSED' || n.type === 'EMI_PAID' || n.type === 'CUSTOMER_ALERT'));
+      }
     } catch (err) {
       console.warn('Refresh error:', err);
     } finally {
@@ -174,45 +180,22 @@ export function MasterSinglePage() {
     }
   }, [calcAmount, calcTenure, calcRate]);
 
-  // Authentication Action
-  const handleAuthSubmit = async (e) => {
-    e.preventDefault();
-    setAuthLoading(true);
+  // Quick Role Sign In
+  const handleQuickLogin = async (role, email, password) => {
     try {
-      if (authMode === 'LOGIN') {
-        const res = await login(authEmail, authPassword);
-        addToast('Signed In', `Welcome, ${res.user?.fullName} (${res.user?.role})!`, 'success');
-      } else {
-        const res = await register({
-          fullName: authName,
-          email: authEmail,
-          phone: authPhone,
-          password: authPassword,
-          monthlyIncome: Number(authIncome),
-          address: 'Bengaluru, Karnataka'
-        });
-        addToast('Account Created', `Customer account registered for ${res.user?.fullName}.`, 'success');
-      }
+      const res = await login(email, password);
+      addToast('Role Switched', `Active Session: ${res.user?.fullName} (${res.user?.role})`, 'success');
       refreshAllData();
     } catch (err) {
-      addToast('Auth Error', err.message || 'Authentication failed', 'error');
-    } finally {
-      setAuthLoading(false);
+      addToast('Login Failed', err.message, 'error');
     }
   };
 
-  const handleFillCredentials = (role, em, pw) => {
-    setAuthRole(role);
-    setAuthEmail(em);
-    setAuthPassword(pw);
-    setAuthMode('LOGIN');
-  };
-
-  // Submit Loan Application (Customer)
+  // 1. CUSTOMER: Submit Loan Application -> Sends Notification to Admin
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     if (!applyForm.fullName || !applyForm.mobile || !applyForm.requestedAmount || !applyForm.bankName) {
-      addToast('Incomplete Form', 'Please fill all required personal, loan, and bank details.', 'error');
+      addToast('Incomplete Form', 'Please fill all required fields.', 'error');
       return;
     }
 
@@ -223,12 +206,12 @@ export function MasterSinglePage() {
           dob: applyForm.dob || '1992-05-14',
           gender: applyForm.gender,
           mobile: applyForm.mobile,
-          email: applyForm.email || (user ? user.email : 'customer@loan.com'),
+          email: applyForm.email || 'customer@loan.com',
           address: applyForm.address || 'Bengaluru, Karnataka'
         },
         employmentDetails: {
           employmentType: applyForm.employmentType,
-          companyName: applyForm.companyName || 'Corporate Enterprise',
+          companyName: applyForm.companyName || 'TechCorp Global Solutions',
           monthlyIncome: Number(applyForm.monthlyIncome),
           workExperience: '5 Years',
           existingEmi: Number(applyForm.existingEmi)
@@ -248,14 +231,11 @@ export function MasterSinglePage() {
       };
 
       const res = await api.applications.submit(payload);
-      addToast('Application Created', `Loan application ${res.application?.applicationNumber} submitted! Admin has received an alert.`, 'success');
-
-      // Reset form
-      setApplyForm(prev => ({
-        ...prev,
-        loanPurpose: '',
-        requestedAmount: 500000
-      }));
+      addToast(
+        'Application Submitted!',
+        `Loan application ${res.application?.applicationNumber} submitted! Admin has received an alert.`,
+        'success'
+      );
 
       refreshAllData();
     } catch (err) {
@@ -263,11 +243,11 @@ export function MasterSinglePage() {
     }
   };
 
-  // Admin Document Verify/Reject
+  // 2. ADMIN: Verify KYC Document
   const handleVerifyDoc = async (appId, docType, status) => {
     try {
       await api.admin.verifyDocument(appId, docType, status);
-      addToast('Document Status', `${docType} marked as ${status}.`, 'success');
+      addToast('Document Verified', `${docType} marked as ${status}.`, 'success');
       refreshAllData();
       if (selectedApp) {
         const updated = await api.admin.getApplicationById(appId);
@@ -278,13 +258,17 @@ export function MasterSinglePage() {
     }
   };
 
-  // Admin Approve Loan
+  // 3. ADMIN: Approve Loan -> Sends Approval Notification to Customer
   const handleApprove = async (e) => {
     e.preventDefault();
     if (!selectedApp) return;
     try {
       const res = await api.admin.approveLoan(selectedApp.id, approveForm);
-      addToast('Loan Sanctioned', res.message, 'success');
+      addToast(
+        'Loan Sanctioned & Approved!',
+        `Application ${selectedApp.applicationNumber} APPROVED for ₹${approveForm.approvedAmount.toLocaleString('en-IN')}. Customer notified!`,
+        'success'
+      );
       setShowApproveModal(false);
       setSelectedApp(null);
       refreshAllData();
@@ -293,13 +277,13 @@ export function MasterSinglePage() {
     }
   };
 
-  // Admin Reject Loan
+  // 4. ADMIN: Reject Loan -> Sends Rejection Notification to Customer
   const handleReject = async (e) => {
     e.preventDefault();
     if (!selectedApp) return;
     try {
       const res = await api.admin.rejectLoan(selectedApp.id, rejectForm);
-      addToast('Application Rejected', `Application ${selectedApp.applicationNumber} marked as REJECTED. Customer has been notified.`, 'error');
+      addToast('Application Declined', `Application ${selectedApp.applicationNumber} REJECTED. Customer has been notified.`, 'error');
       setShowRejectModal(false);
       setSelectedApp(null);
       refreshAllData();
@@ -308,21 +292,21 @@ export function MasterSinglePage() {
     }
   };
 
-  // Admin Disburse Loan
+  // 5. ADMIN: Disburse Loan -> Sends Disbursement Notification to Customer & Generates EMI Schedule
   const handleDisburse = async (e) => {
     e.preventDefault();
     if (!showDisburseModal) return;
     try {
       const res = await api.admin.disburseLoan(showDisburseModal.id, { disbursementRef: disburseRef });
-      addToast('Disbursement Success', res.message, 'success');
+      addToast('Funds Disbursed!', `Loan ${showDisburseModal.loanNumber} is now ACTIVE. Customer received disbursement notice!`, 'success');
       setShowDisburseModal(null);
       refreshAllData();
     } catch (err) {
-      addToast('Disbursement Failed', err.message, 'error');
+      addToast('Disbursement Error', err.message, 'error');
     }
   };
 
-  // Customer Pay EMI
+  // 6. CUSTOMER: Pay EMI Online -> Reduces Principal & Generates Payment Notification
   const handlePayEmi = async (e) => {
     e.preventDefault();
     if (!payingEmi) return;
@@ -330,9 +314,9 @@ export function MasterSinglePage() {
       const res = await api.loans.payEmi(selectedLoanId, {
         emiScheduleId: payingEmi.id,
         paymentMethod,
-        paymentRef: `UPI-REF-${Date.now().toString().slice(-6)}`
+        paymentRef: `UPI-TXN-${Date.now().toString().slice(-6)}`
       });
-      addToast('EMI Payment Successful', res.message, 'success');
+      addToast('EMI Payment Successful', `Installment #${payingEmi.emiNumber} paid successfully! Balance reduced.`, 'success');
       setPayingEmi(null);
       refreshAllData();
     } catch (err) {
@@ -345,8 +329,8 @@ export function MasterSinglePage() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-16">
-      {/* 1. TOP HEADER & BRAND BAR */}
-      <header className="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-sm">
+      {/* HEADER & ONE-CLICK ROLE ACCESS */}
+      <header className="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 bg-emerald-600 text-white flex items-center justify-center font-bold">
@@ -357,31 +341,30 @@ export function MasterSinglePage() {
                 Loan Management System
               </span>
               <span className="text-[10px] text-emerald-400 font-mono block">
-                Single-Page Enterprise Workspace
+                All-In-One Unified Lending Console
               </span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 text-xs font-mono">
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="text-slate-300">
-                  Signed in as: <strong className="text-white font-bold">{user?.fullName} ({user?.role})</strong>
-                </span>
-                <button
-                  onClick={logout}
-                  className="btn-secondary py-1 px-2.5 text-[11px] text-rose-400 border-slate-700 bg-slate-800 hover:bg-slate-700"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <span className="text-slate-400">Please Sign In Below</span>
-            )}
+          {/* Quick Access Pills in Header */}
+          <div className="flex items-center space-x-2 font-mono text-xs">
+            <button
+              onClick={() => handleQuickLogin('CUSTOMER', 'customer@loan.com', 'customer123')}
+              className="py-1.5 px-3 uppercase border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white cursor-pointer font-bold"
+            >
+              👤 Customer Mode (customer@loan.com)
+            </button>
+
+            <button
+              onClick={() => handleQuickLogin('ADMIN', 'admin@loan.com', 'admin123')}
+              className="py-1.5 px-3 uppercase border border-emerald-600 bg-emerald-800 hover:bg-emerald-700 text-white cursor-pointer font-bold"
+            >
+              🛡️ Admin Mode (admin@loan.com)
+            </button>
 
             <button
               onClick={refreshAllData}
-              className="p-1.5 bg-slate-800 text-slate-300 hover:text-white border border-slate-700"
+              className="p-1.5 bg-slate-800 text-slate-300 hover:text-white border border-slate-700 cursor-pointer"
               title="Refresh Live Data"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -390,122 +373,107 @@ export function MasterSinglePage() {
         </div>
       </header>
 
-      {/* Main Single Page Container */}
+      {/* MAIN SINGLE-PAGE WORKSPACE */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
-        {/* 2. AUTHENTICATION & CREDENTIALS BOX */}
-        <div className="border border-slate-200 bg-white p-6 space-y-5 text-xs shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-3">
-            <div>
-              <h2 className="font-bold uppercase tracking-wider text-slate-900 text-sm flex items-center gap-2">
-                <Lock className="w-4 h-4 text-slate-900" />
-                <span>Account Login & Registration Console</span>
-              </h2>
-              <p className="text-[11px] text-slate-500">Sign in with Admin or Customer credentials to manage loans, approvals, and repayments</p>
+        {/* HERO BANNER */}
+        <div className="border border-slate-900 bg-slate-900 text-white p-6 sm:p-8 space-y-3 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-widest uppercase bg-slate-800 text-emerald-400 px-2 py-0.5 border border-slate-700 font-bold">
+                End-To-End Master Platform
+              </span>
+              <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider text-white">
+                Customer Loan Application & Admin Underwriting Approval Console
+              </h1>
             </div>
 
-            {/* 1-Click Credential Pills */}
-            <div className="flex items-center gap-2 font-mono text-[11px]">
-              <span className="text-slate-400 text-[10px] uppercase font-bold">Quick Fill:</span>
-              <button
-                type="button"
-                onClick={() => handleFillCredentials('CUSTOMER', 'customer@loan.com', 'customer123')}
-                className="py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 font-bold cursor-pointer"
-              >
-                👤 Customer (customer@loan.com)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillCredentials('ADMIN', 'admin@loan.com', 'admin123')}
-                className="py-1 px-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer"
-              >
-                🛡️ Admin (admin@loan.com)
-              </button>
+            <div className="text-right text-xs font-mono">
+              <span className="text-slate-400 block text-[10px]">Session Operator:</span>
+              <strong className="text-emerald-400 text-sm font-bold">{user?.fullName || 'Rahul Kumar'} ({user?.role || 'CUSTOMER'})</strong>
             </div>
           </div>
 
-          <form onSubmit={handleAuthSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">Email Address</label>
-              <input
-                type="email"
-                required
-                value={authEmail}
-                onChange={(e) => setAuthEmail(e.target.value)}
-                placeholder="name@loan.com"
-                className="input-field font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={authPassword}
-                onChange={(e) => setAuthPassword(e.target.value)}
-                placeholder="••••••••"
-                className="input-field font-mono"
-              />
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="btn-primary w-full py-2 text-xs uppercase tracking-wider font-bold cursor-pointer disabled:opacity-50"
-              >
-                {authLoading ? 'Signing In...' : 'Sign In Account →'}
-              </button>
-            </div>
-
-            <div className="text-[11px] text-slate-500 font-mono">
-              Demo Passwords: <strong>customer123</strong> / <strong>admin123</strong>
-            </div>
-          </form>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed font-light">
+            <strong>Connected Workflow:</strong> Apply for a loan below ➔ Admin gets instant application alert ➔ Admin verifies KYC documents and clicks <strong>"Approve"</strong> ➔ Customer receives official <strong>"Loan Approved!"</strong> alert ➔ Admin disburses funds ➔ Customer pays monthly EMI online.
+          </p>
         </div>
 
-        {/* 3. DUAL NOTIFICATIONS TICKER (CUSTOMER & ADMIN ALERTS) */}
-        <div className="border border-slate-200 bg-white p-5 space-y-3 text-xs shadow-sm">
-          <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-            <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-slate-900" />
-              <h2 className="font-bold uppercase tracking-wider text-slate-900 text-xs">
-                Real-Time System Notification Stream (Customer & Admin)
-              </h2>
-            </div>
-            <span className="text-[10px] font-mono text-slate-400">{notifications.length} Events Recorded</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {notifications.length === 0 ? (
-              <div className="col-span-3 py-4 text-center text-slate-400 font-mono">
-                No notifications yet. Submit a loan application below to trigger live notifications!
+        {/* 1. DUAL LIVE NOTIFICATION FEEDS (ADMIN & CUSTOMER) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-sans">
+          {/* Admin Notifications Box */}
+          <div className="border border-amber-300 bg-amber-50/40 p-5 space-y-3 shadow-sm">
+            <div className="flex justify-between items-center border-b border-amber-200 pb-2">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-amber-800" />
+                <h3 className="font-bold uppercase tracking-wider text-amber-900 text-xs">
+                  🛡️ Admin Underwriting Alerts ({adminNotifications.length})
+                </h3>
               </div>
-            ) : (
-              notifications.slice(0, 3).map((n) => (
-                <div key={n.id} className="p-3 bg-slate-50 border border-slate-200 space-y-1">
-                  <div className="flex justify-between items-baseline">
-                    <strong className="text-slate-900 font-bold block">{n.title}</strong>
-                    <span className="text-[9px] font-mono text-slate-400">{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                  <p className="text-slate-600 text-[11px] leading-relaxed line-clamp-2">{n.message}</p>
+              <span className="text-[10px] font-mono text-amber-700 font-bold">Incoming Applications</span>
+            </div>
+
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {adminNotifications.length === 0 ? (
+                <div className="p-3 bg-white border border-amber-200 text-slate-500 text-center font-mono">
+                  No incoming applications yet. Submit a loan below to trigger an admin alert!
                 </div>
-              ))
-            )}
+              ) : (
+                adminNotifications.map((n) => (
+                  <div key={n.id} className="p-2.5 bg-white border border-amber-200 space-y-0.5">
+                    <div className="flex justify-between items-baseline">
+                      <strong className="text-slate-900 font-bold">{n.title}</strong>
+                      <span className="text-[9px] font-mono text-slate-400">{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">{n.message}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Customer Notifications Box */}
+          <div className="border border-emerald-300 bg-emerald-50/40 p-5 space-y-3 shadow-sm">
+            <div className="flex justify-between items-center border-b border-emerald-200 pb-2">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-emerald-800" />
+                <h3 className="font-bold uppercase tracking-wider text-emerald-900 text-xs">
+                  👤 Customer Notifications & Approval Alerts ({customerNotifications.length})
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-700 font-bold">Decision & Payments</span>
+            </div>
+
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {customerNotifications.length === 0 ? (
+                <div className="p-3 bg-white border border-emerald-200 text-slate-500 text-center font-mono">
+                  No customer alerts yet. When Admin approves your loan, the approval notice will appear here!
+                </div>
+              ) : (
+                customerNotifications.map((n) => (
+                  <div key={n.id} className="p-2.5 bg-white border border-emerald-200 space-y-0.5">
+                    <div className="flex justify-between items-baseline">
+                      <strong className="text-slate-900 font-bold">{n.title}</strong>
+                      <span className="text-[9px] font-mono text-slate-400">{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">{n.message}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
-        {/* 4. COMPONENT: SUBMIT LOAN APPLICATION (CUSTOMER) */}
+        {/* 2. CUSTOMER COMPONENT: APPLY FOR LOAN FORM */}
         <div className="border border-slate-200 bg-white p-6 space-y-5 text-xs shadow-sm">
           <div className="flex justify-between items-center border-b border-slate-200 pb-3">
             <div className="flex items-center gap-2">
               <FilePlus2 className="w-5 h-5 text-slate-900" />
               <h2 className="font-bold uppercase tracking-wider text-slate-900 text-sm">
-                Apply for Loan (Customer Form)
+                1. Customer Loan Application Form (Submit to Request Sanction)
               </h2>
             </div>
-            <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 border border-slate-200">
-              Only Added to Database on Submission
+            <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 border border-emerald-200">
+              Generates Unique LN-1000X
             </span>
           </div>
 
@@ -516,7 +484,6 @@ export function MasterSinglePage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Rahul Kumar"
                   value={applyForm.fullName}
                   onChange={(e) => setApplyForm({ ...applyForm, fullName: e.target.value })}
                   className="input-field"
@@ -528,7 +495,6 @@ export function MasterSinglePage() {
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. +91 98765 11111"
                   value={applyForm.mobile}
                   onChange={(e) => setApplyForm({ ...applyForm, mobile: e.target.value })}
                   className="input-field font-mono"
@@ -540,7 +506,6 @@ export function MasterSinglePage() {
                 <input
                   type="email"
                   required
-                  placeholder="name@loan.com"
                   value={applyForm.email}
                   onChange={(e) => setApplyForm({ ...applyForm, email: e.target.value })}
                   className="input-field font-mono"
@@ -565,7 +530,7 @@ export function MasterSinglePage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Requested Amount (₹) *</label>
+                <label className="block font-semibold text-slate-700 mb-1">Requested Principal (₹) *</label>
                 <input
                   type="number"
                   required
@@ -594,7 +559,7 @@ export function MasterSinglePage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Net Monthly Income (₹) *</label>
+                <label className="block font-semibold text-slate-700 mb-1">Monthly In-Hand Income (₹) *</label>
                 <input
                   type="number"
                   required
@@ -607,7 +572,7 @@ export function MasterSinglePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Bank Name *</label>
+                <label className="block font-semibold text-slate-700 mb-1">Disbursement Bank Name *</label>
                 <input
                   type="text"
                   required
@@ -643,10 +608,13 @@ export function MasterSinglePage() {
               </div>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+              <span className="text-[11px] text-slate-500 font-mono">
+                Attaches KYC: Aadhaar_Card.pdf, PAN_Card.pdf, Salary_Slip.pdf
+              </span>
               <button
                 type="submit"
-                className="btn-primary py-2.5 px-6 text-xs uppercase tracking-wider bg-emerald-700 hover:bg-emerald-800 border-emerald-700 cursor-pointer"
+                className="btn-primary py-2.5 px-8 text-xs uppercase tracking-wider bg-emerald-700 hover:bg-emerald-800 border-emerald-700 cursor-pointer font-bold"
               >
                 Submit Loan Application →
               </button>
@@ -654,13 +622,13 @@ export function MasterSinglePage() {
           </form>
         </div>
 
-        {/* 5. COMPONENT: ADMIN APPLICATIONS QUEUE & DECISION REVIEW */}
+        {/* 3. ADMIN COMPONENT: APPLICATIONS QUEUE & DECISION ENGINE */}
         <div className="border border-slate-200 bg-white space-y-4 text-xs shadow-sm">
           <div className="p-4 border-b border-slate-200 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-slate-900" />
               <h2 className="font-bold uppercase tracking-wider text-slate-900 text-sm">
-                Admin Applications Queue & Credit Decision Engine
+                2. Admin Review Queue & Credit Decision Engine (Underwrite & Sanction)
               </h2>
             </div>
             <span className="text-[11px] font-mono text-slate-400">Total: {applications.length} Applications</span>
@@ -671,20 +639,20 @@ export function MasterSinglePage() {
               <thead>
                 <tr>
                   <th className="table-header">Application ID</th>
-                  <th className="table-header">Customer Name</th>
+                  <th className="table-header">Applicant Name</th>
                   <th className="table-header">Loan Type</th>
                   <th className="table-header text-right">Requested Amount</th>
                   <th className="table-header text-center">Tenure</th>
-                  <th className="table-header text-center">CIBIL Rating</th>
-                  <th className="table-header">Workflow Status</th>
-                  <th className="table-header text-right">Underwrite Decision</th>
+                  <th className="table-header text-center">CIBIL Score</th>
+                  <th className="table-header">Application Status</th>
+                  <th className="table-header text-right">Underwriting Decision</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
                 {applications.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-8 text-center text-slate-400 font-mono">
-                      No loan applications submitted yet. Apply using the form above!
+                      No loan applications submitted yet. Apply above to see it appear here!
                     </td>
                   </tr>
                 ) : (
@@ -712,16 +680,16 @@ export function MasterSinglePage() {
                           onClick={() => {
                             setSelectedApp(app);
                             setApproveForm({
-                              approvedAmount: app.loanDetails?.requestedAmount,
+                              approvedAmount: app.loanDetails?.requestedAmount || 500000,
                               annualRate: 12.0,
-                              tenureMonths: app.loanDetails?.tenureMonths,
-                              adminRemarks: 'Approved after income and KYC verification.'
+                              tenureMonths: app.loanDetails?.tenureMonths || 36,
+                              adminRemarks: 'Income & KYC documents verified. Sanctioned by Credit Committee.'
                             });
                           }}
                           className="btn-secondary py-1 px-2.5 text-[11px] inline-flex items-center gap-1 cursor-pointer"
                         >
                           <Eye className="w-3 h-3" />
-                          <span>Inspect & Underwrite</span>
+                          <span>Review & Audit</span>
                         </button>
 
                         {app.status === 'PENDING_REVIEW' && (
@@ -731,9 +699,9 @@ export function MasterSinglePage() {
                                 setSelectedApp(app);
                                 setShowApproveModal(true);
                               }}
-                              className="btn-success py-1 px-2 text-[10px] uppercase cursor-pointer"
+                              className="btn-success py-1 px-3 text-[10px] uppercase font-bold cursor-pointer"
                             >
-                              Approve
+                              Approve Loan
                             </button>
                             <button
                               onClick={() => {
@@ -755,17 +723,17 @@ export function MasterSinglePage() {
           </div>
         </div>
 
-        {/* 6. COMPONENT: ADMIN DISBURSEMENTS QUEUE */}
+        {/* 4. ADMIN COMPONENT: DISBURSEMENTS QUEUE */}
         <div className="border border-slate-200 bg-white space-y-4 text-xs shadow-sm">
           <div className="p-4 border-b border-slate-200 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Banknote className="w-5 h-5 text-emerald-800" />
               <h2 className="font-bold uppercase tracking-wider text-slate-900 text-sm">
-                Approved Loans Disbursement Queue
+                3. Admin Disbursements Queue (Payout Sanctioned Funds)
               </h2>
             </div>
             <span className="text-[11px] font-mono text-slate-400">
-              {loans.filter(l => l.status === 'APPROVED').length} Approved Awaiting Payout
+              {loans.filter(l => l.status === 'APPROVED').length} Approved Awaiting Transfer
             </span>
           </div>
 
@@ -779,14 +747,14 @@ export function MasterSinglePage() {
                   <th className="table-header text-right">Sanctioned Amount</th>
                   <th className="table-header">Beneficiary Bank Account</th>
                   <th className="table-header">Status</th>
-                  <th className="table-header text-right">Disbursement Action</th>
+                  <th className="table-header text-right">Disburse Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium font-mono">
                 {loans.filter(l => l.status === 'APPROVED').length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-6 text-center text-slate-400 font-sans">
-                      No approved loans waiting for disbursement.
+                      No approved loans waiting for disbursement. When you approve an application, it appears here!
                     </td>
                   </tr>
                 ) : (
@@ -807,7 +775,7 @@ export function MasterSinglePage() {
                       <td className="table-cell text-right">
                         <button
                           onClick={() => setShowDisburseModal(loan)}
-                          className="btn-success py-1.5 px-3 text-xs uppercase bg-emerald-800 hover:bg-emerald-900 border-emerald-800 cursor-pointer font-sans"
+                          className="btn-success py-1.5 px-4 text-xs uppercase bg-emerald-800 hover:bg-emerald-900 border-emerald-800 cursor-pointer font-bold font-sans"
                         >
                           Disburse Funds →
                         </button>
@@ -820,13 +788,13 @@ export function MasterSinglePage() {
           </div>
         </div>
 
-        {/* 7. COMPONENT: ACTIVE LOANS & INTERACTIVE EMI AMORTIZATION SCHEDULE */}
+        {/* 5. CUSTOMER COMPONENT: ACTIVE LOANS & MONTH-BY-MONTH EMI SCHEDULE */}
         <div className="border border-slate-200 bg-white space-y-4 text-xs shadow-sm">
           <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <CalendarDays className="w-5 h-5 text-slate-900" />
               <h2 className="font-bold uppercase tracking-wider text-slate-900 text-sm">
-                Active Loan Portfolio & Month-by-Month EMI Schedule
+                4. Customer Active Loans & EMI Amortization Schedule (Pay Online)
               </h2>
             </div>
 
@@ -859,7 +827,7 @@ export function MasterSinglePage() {
                 <strong className="text-sm font-bold text-emerald-400">₹{currentLoan.emiAmount?.toLocaleString('en-IN')}</strong>
               </div>
               <div>
-                <span className="text-slate-400 text-[10px] block">Remaining Balance</span>
+                <span className="text-slate-400 text-[10px] block">Remaining Principal</span>
                 <strong className="text-sm font-bold text-amber-400">₹{currentLoan.remainingPrincipal?.toLocaleString('en-IN')}</strong>
               </div>
               <div>
@@ -891,7 +859,7 @@ export function MasterSinglePage() {
                 {schedule.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-8 text-center text-slate-400 font-sans">
-                      No active loan schedule yet. Disburse an approved loan to generate month-by-month installments.
+                      No active loan amortization schedule yet. When Admin disburses an approved loan, the installment schedule generates here!
                     </td>
                   </tr>
                 ) : (
@@ -915,7 +883,7 @@ export function MasterSinglePage() {
                         ) : (
                           <button
                             onClick={() => setPayingEmi(item)}
-                            className="btn-primary py-1 px-3 text-[10px] uppercase bg-emerald-700 hover:bg-emerald-800 border-emerald-700 cursor-pointer font-sans"
+                            className="btn-primary py-1 px-3 text-[10px] uppercase bg-emerald-700 hover:bg-emerald-800 border-emerald-700 cursor-pointer font-sans font-bold"
                           >
                             Pay EMI →
                           </button>
@@ -929,11 +897,11 @@ export function MasterSinglePage() {
           </div>
         </div>
 
-        {/* 8. COMPONENT: INTERACTIVE EMI CALCULATOR TOOL */}
+        {/* 6. INTERACTIVE EMI CALCULATOR TOOL */}
         <div className="border border-slate-200 bg-white p-6 space-y-4 text-xs shadow-sm">
           <div className="flex items-center gap-2 border-b border-slate-200 pb-2 text-slate-900 font-bold uppercase tracking-wider">
             <Calculator className="w-4 h-4" />
-            <span>Real-Time Amortization & Repayment Calculator</span>
+            <span>Interactive Monthly Repayment Calculator</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -978,13 +946,13 @@ export function MasterSinglePage() {
           </div>
 
           <div className="p-3 bg-slate-900 text-white font-mono flex justify-between items-center">
-            <span>Projected Monthly Installment:</span>
+            <span>Calculated Monthly Installment:</span>
             <strong className="text-xl text-emerald-400 font-bold">₹{calcEmi.toLocaleString('en-IN')} / month</strong>
           </div>
         </div>
       </main>
 
-      {/* INSPECT APPLICATION MODAL */}
+      {/* INSPECT & UNDERWRITE MODAL */}
       {selectedApp && !showApproveModal && !showRejectModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white max-w-2xl w-full border border-slate-300 p-6 space-y-5 text-xs shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -1032,13 +1000,13 @@ export function MasterSinglePage() {
                       <StatusBadge status={doc.status || 'PENDING'} />
                       <button
                         onClick={() => handleVerifyDoc(selectedApp.id, key, 'VERIFIED')}
-                        className="btn-success py-1 px-2 text-[10px] uppercase"
+                        className="btn-success py-1 px-2 text-[10px] uppercase font-bold"
                       >
                         Verify
                       </button>
                       <button
                         onClick={() => handleVerifyDoc(selectedApp.id, key, 'REJECTED')}
-                        className="btn-danger py-1 px-2 text-[10px] uppercase"
+                        className="btn-danger py-1 px-2 text-[10px] uppercase font-bold"
                       >
                         Reject
                       </button>
@@ -1053,15 +1021,15 @@ export function MasterSinglePage() {
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   onClick={() => setShowRejectModal(true)}
-                  className="btn-danger py-2 px-4 text-xs uppercase"
+                  className="btn-danger py-2 px-4 text-xs uppercase font-bold"
                 >
                   Reject Application
                 </button>
                 <button
                   onClick={() => setShowApproveModal(true)}
-                  className="btn-success py-2 px-5 text-xs uppercase bg-emerald-700 hover:bg-emerald-800"
+                  className="btn-success py-2 px-5 text-xs uppercase font-bold bg-emerald-700 hover:bg-emerald-800"
                 >
-                  Sanction & Approve Loan →
+                  Approve Loan & Notify Customer →
                 </button>
               </div>
             )}
@@ -1069,11 +1037,11 @@ export function MasterSinglePage() {
         </div>
       )}
 
-      {/* APPROVE MODAL */}
+      {/* APPROVE LOAN MODAL */}
       {showApproveModal && selectedApp && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <form onSubmit={handleApprove} className="bg-white max-w-md w-full border border-slate-300 p-6 space-y-4 text-xs shadow-2xl">
-            <h3 className="font-bold text-base text-slate-900 uppercase">Approve {selectedApp.applicationNumber}</h3>
+            <h3 className="font-bold text-base text-slate-900 uppercase">Approve & Sanction {selectedApp.applicationNumber}</h3>
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Approved Amount (₹)</label>
               <input
@@ -1085,7 +1053,7 @@ export function MasterSinglePage() {
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Annual Interest Rate (%)</label>
+              <label className="block font-semibold text-slate-700 mb-1">Approved Annual Interest Rate (%)</label>
               <input
                 type="number"
                 step="0.1"
@@ -1096,7 +1064,7 @@ export function MasterSinglePage() {
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Remarks</label>
+              <label className="block font-semibold text-slate-700 mb-1">Remarks & Sanction Notes</label>
               <textarea
                 rows={2}
                 required
@@ -1107,23 +1075,23 @@ export function MasterSinglePage() {
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setShowApproveModal(false)} className="btn-secondary py-1.5 px-3">Cancel</button>
-              <button type="submit" className="btn-success py-1.5 px-4 uppercase bg-emerald-700">Confirm Approval →</button>
+              <button type="submit" className="btn-success py-1.5 px-5 uppercase font-bold bg-emerald-700">Confirm Approval & Send Notification →</button>
             </div>
           </form>
         </div>
       )}
 
-      {/* REJECT MODAL */}
+      {/* REJECT LOAN MODAL */}
       {showRejectModal && selectedApp && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <form onSubmit={handleReject} className="bg-white max-w-md w-full border border-slate-300 p-6 space-y-4 text-xs shadow-2xl">
-            <h3 className="font-bold text-base text-slate-900 uppercase">Reject {selectedApp.applicationNumber}</h3>
+            <h3 className="font-bold text-base text-slate-900 uppercase">Reject Application {selectedApp.applicationNumber}</h3>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Rejection Reason</label>
+              <label className="block font-semibold text-slate-700 mb-1">Primary Decline Reason</label>
               <select
                 value={rejectForm.rejectionReason}
                 onChange={(e) => setRejectForm({ ...rejectForm, rejectionReason: e.target.value })}
-                className="input-field"
+                className="input-field cursor-pointer font-semibold"
               >
                 <option value="Insufficient Income">Insufficient In-Hand Income</option>
                 <option value="Low Credit Score">Low CIBIL Credit Score (&lt;600)</option>
@@ -1143,7 +1111,7 @@ export function MasterSinglePage() {
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setShowRejectModal(false)} className="btn-secondary py-1.5 px-3">Cancel</button>
-              <button type="submit" className="btn-danger py-1.5 px-4 uppercase">Confirm Decline</button>
+              <button type="submit" className="btn-danger py-1.5 px-4 uppercase font-bold">Confirm Decline</button>
             </div>
           </form>
         </div>
@@ -1153,25 +1121,25 @@ export function MasterSinglePage() {
       {showDisburseModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <form onSubmit={handleDisburse} className="bg-white max-w-md w-full border border-slate-300 p-6 space-y-4 text-xs shadow-2xl">
-            <h3 className="font-bold text-base text-slate-900 uppercase">Disburse {showDisburseModal.loanNumber}</h3>
+            <h3 className="font-bold text-base text-slate-900 uppercase">Disburse Funds for {showDisburseModal.loanNumber}</h3>
             <div className="p-3 bg-slate-50 border border-slate-200 font-mono space-y-1">
-              <div>Borrower: <strong>{showDisburseModal.customerName}</strong></div>
-              <div>Amount: <strong className="text-emerald-800">₹{showDisburseModal.principalAmount?.toLocaleString('en-IN')}</strong></div>
-              <div>Bank: {showDisburseModal.bankDetails?.bankName} ({showDisburseModal.bankDetails?.accountNumber})</div>
+              <div>Customer: <strong>{showDisburseModal.customerName}</strong></div>
+              <div>Sanctioned Amount: <strong className="text-emerald-800">₹{showDisburseModal.principalAmount?.toLocaleString('en-IN')}</strong></div>
+              <div>Bank Account: {showDisburseModal.bankDetails?.bankName} ({showDisburseModal.bankDetails?.accountNumber})</div>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">NEFT / Bank Reference Number</label>
+              <label className="block font-semibold text-slate-700 mb-1">Bank Reference / UTR Number</label>
               <input
                 type="text"
                 required
                 value={disburseRef}
                 onChange={(e) => setDisburseRef(e.target.value)}
-                className="input-field font-mono uppercase"
+                className="input-field font-mono uppercase font-bold"
               />
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setShowDisburseModal(null)} className="btn-secondary py-1.5 px-3">Cancel</button>
-              <button type="submit" className="btn-success py-1.5 px-4 uppercase bg-emerald-800">Disburse Funds →</button>
+              <button type="submit" className="btn-success py-1.5 px-5 uppercase font-bold bg-emerald-800">Confirm Disbursement & Activate →</button>
             </div>
           </form>
         </div>
@@ -1181,15 +1149,15 @@ export function MasterSinglePage() {
       {payingEmi && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <form onSubmit={handlePayEmi} className="bg-white max-w-md w-full border border-slate-300 p-6 space-y-4 text-xs shadow-2xl">
-            <h3 className="font-bold text-base text-slate-900 uppercase">Pay EMI #{payingEmi.emiNumber}</h3>
+            <h3 className="font-bold text-base text-slate-900 uppercase">Pay EMI Installment #{payingEmi.emiNumber}</h3>
             <div className="p-3 bg-slate-50 border border-slate-200 font-mono space-y-1">
               <div>Due Date: {payingEmi.dueDate}</div>
-              <div>Amount: <strong className="text-emerald-800 text-sm">₹{payingEmi.emiAmount?.toLocaleString('en-IN')}</strong></div>
-              <div>Principal Portion: ₹{payingEmi.principalComponent?.toLocaleString('en-IN')}</div>
-              <div>Interest Portion: ₹{payingEmi.interestComponent?.toLocaleString('en-IN')}</div>
+              <div>Amount Due: <strong className="text-emerald-800 text-sm">₹{payingEmi.emiAmount?.toLocaleString('en-IN')}</strong></div>
+              <div>Principal Component: ₹{payingEmi.principalComponent?.toLocaleString('en-IN')}</div>
+              <div>Interest Component: ₹{payingEmi.interestComponent?.toLocaleString('en-IN')}</div>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Select Payment Mode</label>
+              <label className="block font-semibold text-slate-700 mb-1">Select Payment Gateway</label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
@@ -1202,7 +1170,7 @@ export function MasterSinglePage() {
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setPayingEmi(null)} className="btn-secondary py-1.5 px-3">Cancel</button>
-              <button type="submit" className="btn-primary py-1.5 px-4 uppercase bg-emerald-700 hover:bg-emerald-800 border-emerald-700">
+              <button type="submit" className="btn-primary py-1.5 px-5 uppercase font-bold bg-emerald-700 hover:bg-emerald-800 border-emerald-700">
                 Authorize ₹{payingEmi.emiAmount?.toLocaleString('en-IN')} →
               </button>
             </div>
