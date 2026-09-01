@@ -1432,6 +1432,27 @@
   },
   "auditLogs": [
     {
+      "id": "log-1788285960991-196",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T18:06:00.991Z"
+    },
+    {
+      "id": "log-1788285942715-349",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T18:05:42.715Z"
+    },
+    {
+      "id": "log-1788285937979-253",
+      "actor": "Rahul Kumar",
+      "action": "USER_LOGIN",
+      "details": "Logged in successfully as CUSTOMER",
+      "timestamp": "2026-09-01T18:05:37.979Z"
+    },
+    {
       "id": "log-1788285791363-292",
       "actor": "Rahul Kumar",
       "action": "USER_LOGIN",

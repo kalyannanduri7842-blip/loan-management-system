@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-// Unified 1-Page Master Console
+// Unified All-In-One Master Page (All Dashboards, Forms, Portals & Notifications in 1 View)
 import { MasterSinglePage } from '../pages/MasterSinglePage';
 
 // Public & Layouts
@@ -53,11 +53,12 @@ function ProtectedAdminRoute({ children }) {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* 1. PRIMARY HOME PAGE */}
-      <Route path="/" element={<Home />} />
-      <Route path="/home" element={<Home />} />
+      {/* 1. PRIMARY ALL-IN-ONE MASTER PAGE WITH ALL DASHBOARDS MERGED */}
+      <Route path="/" element={<MasterSinglePage />} />
+      <Route path="/all-in-one" element={<MasterSinglePage />} />
+      <Route path="/console" element={<MasterSinglePage />} />
 
-      {/* 2. DEDICATED SEPARATE LOGIN & REGISTER PAGES */}
+      {/* 2. DEDICATED AUTHENTICATION SCREENS */}
       <Route path="/customer-login" element={<CustomerLogin />} />
       <Route path="/login" element={<CustomerLogin />} />
       <Route path="/customer-register" element={<Register />} />
@@ -67,12 +68,10 @@ export function AppRoutes() {
       <Route path="/admin/login" element={<AdminLogin />} />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/landing" element={<Home />} />
+      <Route path="/home" element={<Home />} />
 
-      {/* 3. UNIFIED ALL-IN-ONE CONSOLE */}
-      <Route path="/all-in-one" element={<MasterSinglePage />} />
-      <Route path="/console" element={<MasterSinglePage />} />
-
-      {/* 4. CUSTOMER WORKSPACE PORTAL */}
+      {/* 3. INDEPENDENT CUSTOMER PORTAL */}
       <Route
         element={
           <ProtectedCustomerRoute>
@@ -91,7 +90,7 @@ export function AppRoutes() {
         <Route path="/profile" element={<CustomerProfile />} />
       </Route>
 
-      {/* 5. ADMIN OPERATIONS CONSOLE */}
+      {/* 4. INDEPENDENT ADMIN PORTAL */}
       <Route
         path="/admin"
         element={
