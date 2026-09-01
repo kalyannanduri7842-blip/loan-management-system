@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { Landmark, Shield, User, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Landmark, User, Shield, Lock, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export function Login() {
   const [searchParams] = useSearchParams();
-  const initialRole = searchParams.get('role') === 'admin' ? 'ADMIN' : 'CUSTOMER';
-  const [selectedRole, setSelectedRole] = useState(initialRole);
+  const [selectedRole, setSelectedRole] = useState(
+    searchParams.get('role') === 'admin' ? 'ADMIN' : 'CUSTOMER'
+  );
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('customer@loan.com');
+  const [password, setPassword] = useState('customer123');
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
@@ -22,7 +23,7 @@ export function Login() {
       setEmail('admin@loan.com');
       setPassword('admin123');
     } else {
-      setEmail('rahul@gmail.com');
+      setEmail('customer@loan.com');
       setPassword('customer123');
     }
   }, [selectedRole]);
@@ -30,32 +31,31 @@ export function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await login(email, password);
-      addToast('Authentication Successful', `Welcome back, ${res.user?.fullName}!`, 'success');
+      addToast(
+        'Authentication Successful',
+        `Welcome, ${res.user?.fullName}! Logged in as ${res.user?.role}.`,
+        'success'
+      );
 
       if (res.user?.role === 'ADMIN') {
         navigate('/admin/dashboard');
       } else {
-        const redirect = searchParams.get('redirect');
-        if (redirect === 'apply') {
-          const type = searchParams.get('type') || 'Personal Loan';
-          navigate(`/apply-loan?type=${encodeURIComponent(type)}`);
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }
     } catch (err) {
-      addToast('Login Failed', err.message || 'Invalid email or password', 'error');
+      addToast('Login Failed', err.message || 'Invalid email address or password', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFillDemo = (role, demoEmail, demoPass) => {
+  const handleQuickFill = (role, em, pw) => {
     setSelectedRole(role);
-    setEmail(demoEmail);
-    setPassword(demoPass);
+    setEmail(em);
+    setPassword(pw);
   };
 
   return (
@@ -70,21 +70,21 @@ export function Login() {
           </span>
         </Link>
         <p className="text-xs text-slate-500 font-mono">
-          Secure Multi-Role Financial Authentication
+          Unified Access Portal • Exactly 2 Roles: Customer & Admin
         </p>
       </div>
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white border border-slate-300 p-8 space-y-6 shadow-sm">
-          {/* Role Toggle Tabs */}
-          <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 border border-slate-200">
+          {/* Role Switcher Tabs */}
+          <div className="grid grid-cols-2 gap-2 border-b border-slate-200 pb-4">
             <button
               type="button"
               onClick={() => setSelectedRole('CUSTOMER')}
-              className={`py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 px-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                 selectedRole === 'CUSTOMER'
-                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <User className="w-3.5 h-3.5" />
@@ -94,31 +94,30 @@ export function Login() {
             <button
               type="button"
               onClick={() => setSelectedRole('ADMIN')}
-              className={`py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 px-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                 selectedRole === 'ADMIN'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>Admin Login</span>
+              <span>Admin Underwriter</span>
             </button>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                {selectedRole === 'ADMIN' ? 'Administrator Email Address' : 'Customer Registered Email'}
+                {selectedRole === 'ADMIN' ? 'Admin Email Address' : 'Customer Email Address'}
               </label>
               <div className="relative">
                 <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
                   className="input-field pl-9 font-mono"
                 />
               </div>
@@ -126,9 +125,9 @@ export function Login() {
 
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block font-semibold text-slate-700">Account Password</label>
-                <Link to="/forgot-password" className="text-[11px] text-slate-500 hover:text-slate-900 underline">
-                  Forgot password?
+                <label className="font-semibold text-slate-700">Account Password</label>
+                <Link to="/forgot-password" className="text-slate-500 hover:text-slate-900 text-[11px] underline">
+                  Forgot Password?
                 </Link>
               </div>
               <div className="relative">
@@ -136,9 +135,9 @@ export function Login() {
                 <input
                   type="password"
                   required
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   className="input-field pl-9 font-mono"
                 />
               </div>
@@ -149,46 +148,44 @@ export function Login() {
               disabled={loading}
               className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              <span>{loading ? 'Authenticating...' : `Sign In as ${selectedRole}`}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>{loading ? 'Authenticating...' : `Sign In as ${selectedRole === 'ADMIN' ? 'Admin' : 'Customer'} →`}</span>
             </button>
           </form>
 
-          {/* Quick 1-Click Demo Credentials */}
-          <div className="pt-4 border-t border-slate-100 space-y-2">
+          {/* Quick Demo Test Credentials Helper */}
+          <div className="border-t border-slate-100 pt-4 space-y-2 text-xs">
             <span className="text-[10px] font-mono text-slate-400 uppercase font-bold block">
-              1-Click Demo Testing Credentials:
+              1-Click Demo Credentials:
             </span>
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => handleFillDemo('CUSTOMER', 'rahul@gmail.com', 'customer123')}
+                onClick={() => handleQuickFill('CUSTOMER', 'customer@loan.com', 'customer123')}
                 className="p-2 border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left cursor-pointer"
               >
-                <strong className="text-slate-900 block font-bold">Rahul Kumar</strong>
-                <span className="text-slate-500 text-[10px] block">Customer (780 CIBIL)</span>
+                <strong className="block text-slate-900 font-bold">👤 Customer</strong>
+                <span className="text-[10px] text-slate-500 font-mono block truncate">customer@loan.com</span>
+                <span className="text-[10px] text-slate-400 font-mono">customer123</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleFillDemo('ADMIN', 'admin@loan.com', 'admin123')}
-                className="p-2 border border-slate-800 bg-slate-900 text-white hover:bg-slate-800 text-left cursor-pointer"
+                onClick={() => handleQuickFill('ADMIN', 'admin@loan.com', 'admin123')}
+                className="p-2 border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left cursor-pointer"
               >
-                <strong className="text-emerald-400 block font-bold">Credit Officer</strong>
-                <span className="text-slate-300 text-[10px] block">Admin Authority</span>
+                <strong className="block text-slate-900 font-bold">🛡️ Admin</strong>
+                <span className="text-[10px] text-slate-500 font-mono block truncate">admin@loan.com</span>
+                <span className="text-[10px] text-slate-400 font-mono">admin123</span>
               </button>
             </div>
           </div>
 
-          {/* Register Link */}
-          {selectedRole === 'CUSTOMER' && (
-            <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-bold text-slate-900 underline">
-                Register as New Customer
-              </Link>
-            </div>
-          )}
+          <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-600">
+            Don't have a customer account?{' '}
+            <Link to="/register" className="font-bold text-slate-900 underline">
+              Register New Customer
+            </Link>
+          </div>
         </div>
       </div>
     </div>
