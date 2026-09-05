@@ -2592,6 +2592,19 @@
   },
   "auditLogs": [
     {
+      "id": "log-1788591331028-830",
+      "actor": "TEST_RUNNER",
+      "role": "SYSTEM",
+      "action": "HEALTH_CHECK",
+      "applicationId": null,
+      "prevStatus": null,
+      "newStatus": null,
+      "details": {
+        "passed": true
+      },
+      "timestamp": "2026-09-05T06:55:31.028Z"
+    },
+    {
       "id": "log-1788591211086-592",
       "actor": "TEST_RUNNER",
       "role": "SYSTEM",
