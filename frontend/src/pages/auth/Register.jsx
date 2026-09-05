@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { Landmark, User, Mail, Lock, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { Landmark, User, Mail, Lock, Phone, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export function Register() {
   const [formData, setFormData] = useState({
@@ -11,7 +11,10 @@ export function Register() {
     phone: '',
     password: '',
     monthlyIncome: 75000,
-    address: ''
+    address: '',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    postalCode: '560001'
   });
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +28,7 @@ export function Register() {
     try {
       await register(formData);
       addToast('Registration Successful', 'Welcome to Loan Management System! You can now apply for loans.', 'success');
-      navigate('/dashboard');
+      navigate('/customer/dashboard');
     } catch (err) {
       addToast('Registration Error', err.message || 'Could not create account', 'error');
     } finally {
@@ -38,7 +41,7 @@ export function Register() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md space-y-3 text-center">
         <Link to="/" className="inline-flex items-center space-x-2">
           <div className="w-8 h-8 bg-slate-900 flex items-center justify-center text-white">
-            <Landmark className="w-4 h-4" />
+            <Landmark className="w-4 h-4 text-emerald-400" />
           </div>
           <span className="font-bold text-base tracking-wider uppercase text-slate-900">
             Loan Management System
@@ -102,31 +105,66 @@ export function Register() {
               <input
                 type="number"
                 required
-                min={10000}
+                min="10000"
+                placeholder="75000"
                 value={formData.monthlyIncome}
-                onChange={(e) => setFormData({ ...formData, monthlyIncome: parseInt(e.target.value) || 0 })}
-                className="input-field font-mono font-bold"
+                onChange={(e) => setFormData({ ...formData, monthlyIncome: e.target.value })}
+                className="input-field font-mono"
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Current Residential Address</label>
+              <label className="block font-semibold text-slate-700 mb-1">Residential Street Address *</label>
               <input
                 type="text"
-                placeholder="e.g. Flat 302, Green Glen Heights, Bengaluru"
+                required
+                placeholder="House/Flat No, Street, Landmark"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="input-field"
               />
             </div>
 
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">City</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">State</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">PIN Code</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.postalCode}
+                  onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                  className="input-field font-mono"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Account Password *</label>
+              <label className="block font-semibold text-slate-700 mb-1">Password (min 6 characters) *</label>
               <input
                 type="password"
                 required
                 minLength={6}
-                placeholder="Minimum 6 characters"
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="input-field font-mono"
@@ -136,19 +174,26 @@ export function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="btn-primary w-full py-2.5 text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer bg-emerald-600 hover:bg-emerald-500 border-emerald-600 font-bold"
             >
-              <span>{loading ? 'Creating Account...' : 'Register Customer Account'}</span>
+              <span>{loading ? 'Creating Account...' : 'Complete Customer Registration'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </form>
 
-          <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-600">
+          <div className="border-t border-slate-200 pt-4 text-center text-[11px] text-slate-600">
             Already have an account?{' '}
-            <Link to="/login" className="font-bold text-slate-900 underline">
-              Sign In Here
+            <Link to="/login/customer" className="font-bold text-slate-900 hover:underline">
+              Customer Sign In
             </Link>
           </div>
+        </div>
+
+        <div className="mt-4 text-center">
+          <Link to="/" className="text-xs text-slate-500 hover:text-slate-900 inline-flex items-center gap-1">
+            <ArrowLeft className="w-3 h-3" />
+            <span>Back to Portal Directory</span>
+          </Link>
         </div>
       </div>
     </div>

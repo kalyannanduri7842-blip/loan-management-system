@@ -433,7 +433,7 @@ export function ApplicationReview() {
 
  {/* APPROVE LOAN MODAL */}
  {showApproveModal && (
- <div className="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center p-4">
+ <div className="fixed inset-0 z-50 bg-gray-900/70 flex items-center justify-center p-4">
  <form onSubmit={handleApproveLoan} className="bg-white max-w-lg w-full border border-slate-300 p-6 space-y-5 text-xs ">
  <div className="flex justify-between items-start border-b border-slate-200 pb-3">
  <div>
@@ -520,7 +520,7 @@ export function ApplicationReview() {
 
  {/* REJECT LOAN MODAL */}
  {showRejectModal && (
- <div className="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center p-4">
+ <div className="fixed inset-0 z-50 bg-gray-900/70 flex items-center justify-center p-4">
  <form onSubmit={handleRejectLoan} className="bg-white max-w-lg w-full border border-slate-300 p-6 space-y-5 text-xs ">
  <div className="flex justify-between items-start border-b border-slate-200 pb-3">
  <div>

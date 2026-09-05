@@ -32,8 +32,8 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const login = async (email, password) => {
-    const res = await api.auth.login({ email, password });
+  const login = async (email, password, requiredRole) => {
+    const res = await api.auth.login({ email, password, requiredRole });
     localStorage.setItem('loan_auth_token', res.token);
     localStorage.setItem('loan_auth_user', JSON.stringify(res.user));
     setUser(res.user);
@@ -49,6 +49,9 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    try {
+      api.auth.logout().catch(() => {});
+    } catch (e) {}
     localStorage.removeItem('loan_auth_token');
     localStorage.removeItem('loan_auth_user');
     setUser(null);
@@ -65,6 +68,8 @@ export function AuthProvider({ children }) {
     loading,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'ADMIN',
+    isManager: user?.role === 'MANAGER',
+    isEmployee: user?.role === 'EMPLOYEE',
     isCustomer: user?.role === 'CUSTOMER',
     login,
     register,

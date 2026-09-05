@@ -9,7 +9,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
-  Landmark
+  Landmark,
+  FilePlus2
 } from 'lucide-react';
 
 export function MyLoans() {
@@ -19,7 +20,7 @@ export function MyLoans() {
   const fetchLoans = async () => {
     setLoading(true);
     try {
-      const res = await api.loans.getMy();
+      const res = await api.customer.getMyLoans();
       setLoans(res.loans || []);
     } catch (err) {
       console.warn('Loans error', err);
@@ -46,21 +47,30 @@ export function MyLoans() {
           </p>
         </div>
 
-        <Link
-          to="/emi-schedule"
-          className="btn-secondary py-2 px-4 text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
-        >
-          <CalendarDays className="w-3.5 h-3.5" />
-          <span>View EMI Schedules</span>
-        </Link>
+        <div className="flex items-center space-x-2">
+          <Link
+            to="/customer/emi-schedule"
+            className="btn-secondary py-2 px-4 text-xs flex items-center gap-1.5 cursor-pointer"
+          >
+            <CalendarDays className="w-3.5 h-3.5" />
+            <span>EMI Schedules</span>
+          </Link>
+          <Link
+            to="/customer/apply"
+            className="btn-primary py-2 px-4 text-xs flex items-center gap-1.5 cursor-pointer bg-emerald-700 hover:bg-emerald-800 border-emerald-700 text-white font-bold"
+          >
+            <FilePlus2 className="w-3.5 h-3.5" />
+            <span>New Loan</span>
+          </Link>
+        </div>
       </div>
 
       {/* Loans Grid / Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
         {loans.length === 0 ? (
           <div className="md:col-span-2 border border-slate-200 bg-white p-12 text-center text-slate-400 space-y-3">
-            <p>You currently do not have any approved or active loan records.</p>
-            <Link to="/apply-loan" className="btn-primary py-2 px-4 text-xs inline-flex">
+            <p>You currently do not have any active or disbursed loan accounts.</p>
+            <Link to="/customer/apply" className="btn-primary py-2 px-4 text-xs inline-flex bg-emerald-600 border-emerald-600 text-white font-bold">
               Apply for Loan Now →
             </Link>
           </div>
@@ -90,53 +100,37 @@ export function MyLoans() {
 
                 <div>
                   <span className="text-slate-400 text-[10px] uppercase block">Monthly EMI</span>
-                  <strong className="text-sm font-bold text-emerald-800">₹{loan.emiAmount?.toLocaleString('en-IN')}</strong>
+                  <strong className="text-sm font-bold text-emerald-800">₹{(loan.monthlyEmi || loan.emiAmount || 0).toLocaleString('en-IN')}</strong>
                 </div>
 
                 <div>
                   <span className="text-slate-400 text-[10px] uppercase block">Remaining Balance</span>
-                  <strong className="text-sm font-bold text-slate-900">₹{loan.remainingPrincipal?.toLocaleString('en-IN')}</strong>
+                  <strong className="text-sm font-bold text-slate-900">₹{(loan.remainingPrincipal || loan.principalAmount).toLocaleString('en-IN')}</strong>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block">Repaid So Far</span>
-                  <strong className="text-sm font-bold text-emerald-700">₹{loan.totalPaidAmount?.toLocaleString('en-IN')}</strong>
+                  <span className="text-slate-400 text-[10px] uppercase block">EMIs Paid</span>
+                  <strong className="text-sm font-bold text-emerald-700">{loan.paidEmisCount || 0} / {loan.totalEmisCount || loan.tenureMonths}</strong>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block">EMIs Completed</span>
-                  <strong className="text-sm font-bold text-slate-900">{loan.paidEmisCount || 0} / {loan.totalEmisCount}</strong>
+                  <span className="text-slate-400 text-[10px] uppercase block">Disbursed Date</span>
+                  <span className="text-xs font-bold text-slate-700">{loan.disbursedDate ? new Date(loan.disbursedDate).toLocaleDateString('en-IN') : 'Pending'}</span>
                 </div>
               </div>
 
-              {/* Disbursement & Bank Summary */}
-              <div className="space-y-1 text-[11px] text-slate-600 font-mono">
-                <div className="flex justify-between">
-                  <span>Disbursed Bank Account:</span>
-                  <strong>{loan.bankDetails?.bankName} ({loan.bankDetails?.accountNumber})</strong>
+              {/* Bank Details & CTA */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-t border-slate-100 pt-3">
+                <div className="text-[11px] text-slate-500 font-mono">
+                  <span>Credited to: <strong>{loan.bankDetails?.bankName} ({loan.bankDetails?.accountNumber})</strong></span>
                 </div>
-                {loan.disbursedDate && (
-                  <div className="flex justify-between">
-                    <span>Disbursed On:</span>
-                    <span>{new Date(loan.disbursedDate).toLocaleDateString('en-IN')}</span>
-                  </div>
-                )}
-                {loan.firstEmiDate && (
-                  <div className="flex justify-between">
-                    <span>First EMI Due Date:</span>
-                    <strong className="text-slate-900">{loan.firstEmiDate}</strong>
-                  </div>
-                )}
-              </div>
 
-              {/* Actions */}
-              <div className="pt-2 border-t border-slate-100 flex gap-2">
                 <Link
-                  to={`/emi-schedule?loanId=${loan.id}`}
-                  className="btn-primary flex-1 py-2 text-xs flex items-center justify-center gap-1.5"
+                  to="/customer/emi-schedule"
+                  className="btn-primary py-1.5 px-4 text-xs flex items-center gap-1 bg-slate-900 hover:bg-slate-800 text-white font-bold"
                 >
-                  <CalendarDays className="w-3.5 h-3.5" />
-                  <span>Amortization Schedule</span>
+                  <span>Pay EMI / Schedule</span>
+                  <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
             </div>
